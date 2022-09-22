@@ -139,7 +139,8 @@ export class ContentGame extends React.Component {
             power: null,
             orderBuildingType: null,
             orderBuildingPath: [],
-            showAbbreviations: true
+            showAbbreviations: true,
+            defconLevel: null
         };
 
         // Bind some class methods to this instance.
@@ -182,6 +183,8 @@ export class ContentGame extends React.Component {
         this.setWaitFlag = this.setWaitFlag.bind(this);
         this.vote = this.vote.bind(this);
         this.updateDeadlineTimer = this.updateDeadlineTimer.bind(this);
+
+        this.onChangeDefconLevel = this.onChangeDefconLevel.bind(this);
     }
 
     static prettyRole(role) {
@@ -881,6 +884,10 @@ export class ContentGame extends React.Component {
         return render;
     }
 
+    onChangeDefconLevel(event) {
+        return this.setState({defconLevel: event.target.value});
+    }
+
     renderPastMessages(engine, role) {
         const messageChannels = engine.getMessageChannels(role, true);
         const tabNames = [];
@@ -890,6 +897,8 @@ export class ContentGame extends React.Component {
         tabNames.push('GLOBAL');
         const titles = tabNames.map(tabName => (tabName === 'GLOBAL' ? tabName : tabName.substr(0, 3)));
         const currentTabId = this.state.tabPastMessages || tabNames[0];
+
+        const defcon_levels = ["DEFCON 1", "DEFCON 2", "DEFCON 3", "DEFCON 4", "DEFCON 5"];
 
         return (
             <div className={'panel-messages'} key={'panel-messages'}>
@@ -902,12 +911,20 @@ export class ContentGame extends React.Component {
                                         messages{engine.isPlayerGame() ? ` with ${protagonist}` : ''}.</div>) :
                                     messageChannels[protagonist].map((message, index) => (
                                         <MessageView key={index} phase={engine.phase} owner={role} message={message}
-                                                     read={true}/>
+                                                    read={true}/>
                                     ))
                             )}
                         </Tab>
+                        
                     ))}
                 </Tabs>
+                <p>Input DEFCON level for {currentTabId} from perspective of {role}: {currentTabId}</p>
+                <select className="custom-select"
+                    id="defcon-select"
+                    value={this.state.defconLevel}
+                    onChange={this.onChangeDefconLevel}>
+                {defcon_levels.map((name, index) => <option key={index} value={index}>{name}</option>)}
+                </select>
             </div>
         );
     }
