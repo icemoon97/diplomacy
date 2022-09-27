@@ -50,6 +50,8 @@ import {SvgPure} from "../maps/pure/SvgPure";
 import {MapData} from "../utils/map_data";
 import {Queue} from "../../diplomacy/utils/queue";
 
+import { saveDefconLabels } from "../utils/defconSaveGame";
+
 const HotKey = require('react-shortcut');
 
 /* Order management in game page.
@@ -140,7 +142,9 @@ export class ContentGame extends React.Component {
             orderBuildingType: null,
             orderBuildingPath: [],
             showAbbreviations: true,
-            defconLevel: null
+
+            selectedDefconLevel: null,
+            defconLabels: {}
         };
 
         // Bind some class methods to this instance.
@@ -885,10 +889,10 @@ export class ContentGame extends React.Component {
     }
 
     onChangeDefconLevel(event) {
-        return this.setState({defconLevel: event.target.value});
+        return this.setState({selectedDefconLevel: event.target.value});
     }
 
-    renderPastMessages(engine, role) {
+    renderPastMessages(engine, role, phaseName) {
         const messageChannels = engine.getMessageChannels(role, true);
         const tabNames = [];
         for (let powerName of Object.keys(engine.powers)) if (powerName !== role)
@@ -918,13 +922,23 @@ export class ContentGame extends React.Component {
                         
                     ))}
                 </Tabs>
-                <p>Input DEFCON level for {currentTabId} from perspective of {role}: {currentTabId}</p>
+                <p>Input DEFCON level for {currentTabId} from perspective of {role}, phase {phaseName}:</p>
                 <select className="custom-select"
                     id="defcon-select"
-                    value={this.state.defconLevel}
-                    onChange={this.onChangeDefconLevel}>
+                    value={this.state.selectedDefconLevel}
+                    // onChange={this.onChangeDefconLevel}
+                    onChange={event => {
+                        let labels = Object.assign({}, this.state.defconLabels); 
+                        let time_pair = phaseName + "-" + role + "-" + currentTabId;
+                        // labels["1905F-AUSTRIA-RUSSIA"] = event.target.value;  
+                        labels[time_pair] = event.target.value;                               
+                        return this.setState({selectedDefconLevel: event.target.value, defconLabels: labels});
+                        // https://stackoverflow.com/questions/43638938/updating-an-object-with-setstate-in-react
+                    }}>
                 {defcon_levels.map((name, index) => <option key={index} value={index}>{name}</option>)}
                 </select>
+                <p>Comments:</p>
+                
             </div>
         );
     }
@@ -1181,7 +1195,7 @@ export class ContentGame extends React.Component {
                         {pastPhases[phaseIndex] === initialEngine.phase ? (
                             this.renderCurrentMessages(initialEngine, currentPowerName)
                         ) : (
-                            this.renderPastMessages(engine, currentPowerName)
+                            this.renderPastMessages(engine, currentPowerName, pastPhases[phaseIndex])
                         )}
                     </div>
                 </Row>
@@ -1244,7 +1258,8 @@ export class ContentGame extends React.Component {
             ['Save game to disk', () => saveGameToDisk(engine, page.error)],
             [`${UTILS.html.UNICODE_SMALL_LEFT_ARROW} Games`, () => page.loadGames()],
             [`${UTILS.html.UNICODE_SMALL_LEFT_ARROW} Leave game`, () => page.leaveGame(engine.game_id)],
-            [`${UTILS.html.UNICODE_SMALL_LEFT_ARROW} Logout`, page.logout]
+            [`${UTILS.html.UNICODE_SMALL_LEFT_ARROW} Logout`, page.logout],
+            ['**Save DEFCON-labelled game to disk**', () => saveDefconLabels(engine, {'labels': this.state.defconLabels})],
         ];
         const phaseType = engine.getPhaseType();
         const controllablePowers = engine.getControllablePowers();
