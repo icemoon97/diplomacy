@@ -144,6 +144,7 @@ export class ContentGame extends React.Component {
             showAbbreviations: true,
 
             selectedDefconLevel: null,
+            defconComment: null,
             defconLabels: {}
         };
 
@@ -188,7 +189,6 @@ export class ContentGame extends React.Component {
         this.vote = this.vote.bind(this);
         this.updateDeadlineTimer = this.updateDeadlineTimer.bind(this);
 
-        this.onChangeDefconLevel = this.onChangeDefconLevel.bind(this);
     }
 
     static prettyRole(role) {
@@ -493,7 +493,7 @@ export class ContentGame extends React.Component {
     }
 
     onChangeTabPastMessages(tab) {
-        return this.setState({tabPastMessages: tab});
+        return this.setState({tabPastMessages: tab, defconComment: "", selectedDefconLevel: 0});
     }
 
     sendMessage(networkGame, recipient, body) {
@@ -802,7 +802,9 @@ export class ContentGame extends React.Component {
         return this.setState({
             historyPhaseIndex: newPhaseIndex,
             historyCurrentLoc: null,
-            historyCurrentOrders: null
+            historyCurrentOrders: null,
+            defconComment: "",
+            selectedDefconLevel: 0
         });
     }
 
@@ -888,9 +890,6 @@ export class ContentGame extends React.Component {
         return render;
     }
 
-    onChangeDefconLevel(event) {
-        return this.setState({selectedDefconLevel: event.target.value});
-    }
 
     renderPastMessages(engine, role, phaseName) {
         const messageChannels = engine.getMessageChannels(role, true);
@@ -902,7 +901,7 @@ export class ContentGame extends React.Component {
         const titles = tabNames.map(tabName => (tabName === 'GLOBAL' ? tabName : tabName.substr(0, 3)));
         const currentTabId = this.state.tabPastMessages || tabNames[0];
 
-        const defcon_levels = ["DEFCON 1", "DEFCON 2", "DEFCON 3", "DEFCON 4", "DEFCON 5"];
+        const defcon_levels = ["Not yet selected", "DEFCON 1", "DEFCON 2", "DEFCON 3", "DEFCON 4", "DEFCON 5"];
 
         return (
             <div className={'panel-messages'} key={'panel-messages'}>
@@ -922,26 +921,50 @@ export class ContentGame extends React.Component {
                         
                     ))}
                 </Tabs>
+
                 <p>Input DEFCON level for {currentTabId} from perspective of {role}, phase {phaseName}:</p>
                 <select className="custom-select"
                     id="defcon-select"
                     value={this.state.selectedDefconLevel}
-                    // onChange={this.onChangeDefconLevel}
+
                     onChange={event => {
-                        let labels = Object.assign({}, this.state.defconLabels); 
-                        let time_pair = phaseName + "-" + role + "-" + currentTabId;
-                        // labels["1905F-AUSTRIA-RUSSIA"] = event.target.value;  
-                        labels[time_pair] = event.target.value;                               
-                        return this.setState({selectedDefconLevel: event.target.value, defconLabels: labels});
-                        // https://stackoverflow.com/questions/43638938/updating-an-object-with-setstate-in-react
+                        return this.setState({selectedDefconLevel: event.target.value, });
                     }}>
                 {defcon_levels.map((name, index) => <option key={index} value={index}>{name}</option>)}
                 </select>
+
                 <p>Comments:</p>
+                <textarea className={'form-control'}
+                    id={'defcon-comment'} 
+                    value={this.state.defconComment} 
+                    onChange={event => {
+                        return this.setState({defconComment: event.target.value});
+                    }}/>
+
+                <button class="btn btn-secondary" 
+                        type="button" 
+                        id="defcon-submit-button"
+                        onClick={event => {
+                            // https://stackoverflow.com/questions/43638938/updating-an-object-with-setstate-in-react
+                            let labels = Object.assign({}, this.state.defconLabels); 
+                            let time_pair = phaseName + "-" + role + "-" + currentTabId;
+                            labels[time_pair] = {
+                                "defcon": this.state.selectedDefconLevel,
+                                "comment": this.state.defconComment
+                            };  
+
+                            // return this.setState({defconComment: "", selectedDefconLevel: 0, defconLabels: labels});
+                            return this.setState({defconLabels: labels});
+                        }}>
+                    Submit
+                </button>
+                
                 
             </div>
         );
     }
+
+    
 
     renderCurrentMessages(engine, role) {
         const messageChannels = engine.getMessageChannels(role, true);
