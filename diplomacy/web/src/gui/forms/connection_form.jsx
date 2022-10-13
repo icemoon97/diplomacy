@@ -43,7 +43,8 @@ export class ConnectionForm extends React.Component {
 
     initState() {
         return {
-            hostname: window.location.hostname,
+            // hostname: window.location.hostname,
+            hostname: "shade.tacc.utexas.edu",
             port: (window.location.protocol.toLowerCase() === 'https:') ? 8433 : 8432,
             username: '',
             password: '',
