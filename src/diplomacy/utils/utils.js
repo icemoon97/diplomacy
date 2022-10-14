@@ -21,7 +21,7 @@ class Dict {
 
 export const UTILS = {
     NB_CONNECTION_ATTEMPTS: 12,
-    ATTEMPT_DELAY_SECONDS: 5,
+    ATTEMPT_DELAY_SECONDS: 30,
     REQUEST_TIMEOUT_SECONDS: 30,
 
     /** Return a random integer in interval [from, to). **/
