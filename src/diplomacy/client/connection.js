@@ -203,7 +203,8 @@ export class Connection {
     constructor(hostname, port, useSSL) {
         if (useSSL)
             Diplog.info(`Using SSL.`);
-        this.protocol = useSSL ? 'wss' : 'ws';
+        // this.protocol = useSSL ? 'wss' : 'ws';
+        this.protocol = 'ws';
         this.hostname = hostname;
         this.port = port;
         this.socket = null;
