@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/diplomacy-defcon-tool/precache-manifest.d14722ce7bc9068189223c17d2bc0b80.js"
+  "/diplomacy-defcon-tool/precache-manifest.787357825a75a18886206311952f9365.js"
 );
 
 self.addEventListener('message', (event) => {

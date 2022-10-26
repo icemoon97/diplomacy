@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "764c75a8ebd00ef88e59fbc0aed2ce5a",
+    "revision": "79d411c9662ef5cc72bf44851e6f49b7",
     "url": "/diplomacy-defcon-tool/index.html"
   },
   {
@@ -8,7 +8,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/diplomacy-defcon-tool/static/css/2.d64b8b57.chunk.css"
   },
   {
-    "revision": "3abb042e276df6e07f55",
+    "revision": "143f8175e205b71fbb2f",
     "url": "/diplomacy-defcon-tool/static/css/main.19c040f4.chunk.css"
   },
   {
@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/diplomacy-defcon-tool/static/js/2.40df2dad.chunk.js"
   },
   {
-    "revision": "3abb042e276df6e07f55",
-    "url": "/diplomacy-defcon-tool/static/js/main.0787f2b5.chunk.js"
+    "revision": "143f8175e205b71fbb2f",
+    "url": "/diplomacy-defcon-tool/static/js/main.55ea1ca4.chunk.js"
   },
   {
     "revision": "2739591d5dfed8f4dba1",
