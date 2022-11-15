@@ -143,7 +143,7 @@ export class ContentGame extends React.Component {
             orderBuildingPath: [],
             showAbbreviations: true,
 
-            selectedDefconLevel: null,
+            selectedDefconLevel: {}, // press, tactics, aggregate
             defconComment: null,
             defconLabels: {}
         };
@@ -493,7 +493,7 @@ export class ContentGame extends React.Component {
     }
 
     onChangeTabPastMessages(tab) {
-        return this.setState({tabPastMessages: tab, defconComment: "", selectedDefconLevel: 0});
+        return this.setState({tabPastMessages: tab, defconComment: "", selectedDefconLevel: {}});
     }
 
     sendMessage(networkGame, recipient, body) {
@@ -804,7 +804,7 @@ export class ContentGame extends React.Component {
             historyCurrentLoc: null,
             historyCurrentOrders: null,
             defconComment: "",
-            selectedDefconLevel: 0
+            selectedDefconLevel: {}
         });
     }
 
@@ -902,6 +902,7 @@ export class ContentGame extends React.Component {
         const currentTabId = this.state.tabPastMessages || tabNames[0];
 
         const defcon_levels = ["Not yet selected", "DEFCON 1", "DEFCON 2", "DEFCON 3", "DEFCON 4", "DEFCON 5"];
+        const defcon_types = ["Press", "Tactics", "Aggregate"];
 
         return (
             <div className={'panel-messages'} key={'panel-messages'}>
@@ -923,15 +924,22 @@ export class ContentGame extends React.Component {
                 </Tabs>
 
                 <p>Input DEFCON level for {currentTabId} from perspective of {role}, phase {phaseName}:</p>
-                <select className="custom-select"
-                    id="defcon-select"
-                    value={this.state.selectedDefconLevel}
+                {defcon_types.map((type, index) => (
+                    <div style={{display: "flex", alignItems: "center"}} key={index}>
+                        <label style={{paddingRight: "10px"}}>{type}: </label>
+                        <select className="custom-select"
+                            id="defcon-select"
+                            value={type in this.state.selectedDefconLevel ? this.state.selectedDefconLevel[type] : 0}
 
-                    onChange={event => {
-                        return this.setState({selectedDefconLevel: event.target.value, });
-                    }}>
-                {defcon_levels.map((name, index) => <option key={index} value={index}>{name}</option>)}
-                </select>
+                            // https://stackoverflow.com/questions/43638938/updating-an-object-with-setstate-in-react
+                            onChange={event => {
+                                let levels = {...this.state.selectedDefconLevel, [type]: event.target.value};
+                                return this.setState({selectedDefconLevel: levels});
+                            }}>
+                            {defcon_levels.map((name, index) => <option key={index} value={index}>{name}</option>)}
+                        </select>
+                    </div>
+                ))}
 
                 <p>Comments:</p>
                 <textarea className={'form-control'}
@@ -941,7 +949,7 @@ export class ContentGame extends React.Component {
                         return this.setState({defconComment: event.target.value});
                     }}/>
 
-                <button class="btn btn-secondary" 
+                <button className="btn btn-secondary" 
                         type="button" 
                         id="defcon-submit-button"
                         onClick={event => {
@@ -958,8 +966,6 @@ export class ContentGame extends React.Component {
                         }}>
                     Submit
                 </button>
-                
-                
             </div>
         );
     }
