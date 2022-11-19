@@ -481,6 +481,7 @@ export class ContentGame extends React.Component {
     // ]
 
     onChangeCurrentPower(event) {
+        this.__change_defcon_labels();
         return this.setState({power: event.target.value, tabPastMessages: null, tabCurrentMessages: null});
     }
 
@@ -493,7 +494,8 @@ export class ContentGame extends React.Component {
     }
 
     onChangeTabPastMessages(tab) {
-        return this.setState({tabPastMessages: tab, defconComment: "", selectedDefconLevel: {}});
+        this.__change_defcon_labels();
+        return this.setState({tabPastMessages: tab});
     }
 
     sendMessage(networkGame, recipient, body) {
@@ -799,13 +801,18 @@ export class ContentGame extends React.Component {
     }
 
     __change_past_phase(newPhaseIndex) {
+        this.__change_defcon_labels();
         return this.setState({
             historyPhaseIndex: newPhaseIndex,
             historyCurrentLoc: null,
-            historyCurrentOrders: null,
-            defconComment: "",
-            selectedDefconLevel: {}
+            historyCurrentOrders: null
         });
+    }
+
+    __change_defcon_labels() {
+        console.log(this.state);
+        console.log(this.state.power + "-" + this.state.tabPastMessages);
+        return this.setState({defconComment: "", selectedDefconLevel: {}});
     }
 
     onChangePastPhase(event) {
