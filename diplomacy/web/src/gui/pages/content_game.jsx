@@ -143,8 +143,8 @@ export class ContentGame extends React.Component {
             orderBuildingPath: [],
             showAbbreviations: true,
 
-            selectedDefconLevel: {}, // press, tactics, aggregate
-            defconComment: null,
+            //selectedDefconLevel: {}, // press, tactics, aggregate
+            //defconComment: null,
             defconLabels: {}
         };
 
@@ -481,7 +481,7 @@ export class ContentGame extends React.Component {
     // ]
 
     onChangeCurrentPower(event) {
-        this.__change_defcon_labels();
+        // this.__change_defcon_labels();
         return this.setState({power: event.target.value, tabPastMessages: null, tabCurrentMessages: null});
     }
 
@@ -494,7 +494,7 @@ export class ContentGame extends React.Component {
     }
 
     onChangeTabPastMessages(tab) {
-        this.__change_defcon_labels();
+        // this.__change_defcon_labels();
         return this.setState({tabPastMessages: tab});
     }
 
@@ -801,7 +801,7 @@ export class ContentGame extends React.Component {
     }
 
     __change_past_phase(newPhaseIndex) {
-        this.__change_defcon_labels();
+        // this.__change_defcon_labels();
         return this.setState({
             historyPhaseIndex: newPhaseIndex,
             historyCurrentLoc: null,
@@ -809,11 +809,9 @@ export class ContentGame extends React.Component {
         });
     }
 
-    __change_defcon_labels() {
-        console.log(this.state);
-        console.log(this.state.power + "-" + this.state.tabPastMessages);
-        return this.setState({defconComment: "", selectedDefconLevel: {}});
-    }
+    // __change_defcon_labels() {
+    //     return this.setState({defconComment: "", selectedDefconLevel: {}});
+    // }
 
     onChangePastPhase(event) {
         this.__change_past_phase(event.target.value);
@@ -936,12 +934,13 @@ export class ContentGame extends React.Component {
                         <label style={{paddingRight: "10px"}}>{type}: </label>
                         <select className="custom-select"
                             id="defcon-select"
-                            value={type in this.state.selectedDefconLevel ? this.state.selectedDefconLevel[type] : 0}
+                            value={this.__check_previous_labels(phaseName, role, currentTabId, "defcon-" + type)}
 
                             // https://stackoverflow.com/questions/43638938/updating-an-object-with-setstate-in-react
                             onChange={event => {
-                                let levels = {...this.state.selectedDefconLevel, [type]: event.target.value};
-                                return this.setState({selectedDefconLevel: levels});
+                                // let levels = {...this.state.selectedDefconLevel, [type]: event.target.value};
+                                // return this.setState({selectedDefconLevel: levels});
+                                this.__update_defcon_labels(phaseName, role, currentTabId, "defcon-" + type, event.target.value);
                             }}>
                             {defcon_levels.map((name, index) => <option key={index} value={index}>{name}</option>)}
                         </select>
@@ -951,18 +950,18 @@ export class ContentGame extends React.Component {
                 <p>Comments:</p>
                 <textarea className={'form-control'}
                     id={'defcon-comment'} 
-                    value={this.state.defconComment} 
+                    value={this.__check_previous_labels(phaseName, role, currentTabId, "comment", "")} 
                     onChange={event => {
-                        return this.setState({defconComment: event.target.value});
+                        this.__update_defcon_labels(phaseName, role, currentTabId, "comment", event.target.value);
                     }}/>
 
-                <button className="btn btn-secondary" 
+                {/* <button className="btn btn-secondary" 
                         type="button" 
                         id="defcon-submit-button"
                         onClick={event => {
                             // https://stackoverflow.com/questions/43638938/updating-an-object-with-setstate-in-react
-                            let labels = Object.assign({}, this.state.defconLabels); 
-                            let time_pair = phaseName + "-" + role + "-" + currentTabId;
+                            const labels = Object.assign({}, this.state.defconLabels); 
+                            const time_pair = phaseName + "-" + role + "-" + currentTabId;
                             labels[time_pair] = {
                                 "defcon": this.state.selectedDefconLevel,
                                 "comment": this.state.defconComment
@@ -972,11 +971,34 @@ export class ContentGame extends React.Component {
                             return this.setState({defconLabels: labels});
                         }}>
                     Submit
-                </button>
+                </button> */}
             </div>
         );
     }
 
+    __get_time_pair(phase, power, other) {
+        return phase + "-" + power + "-" + other;
+    }
+
+    __check_previous_labels(phase, power, other, type, default_val=0) {
+        const time_pair = this.__get_time_pair(phase, power, other);
+        if (time_pair in this.state.defconLabels) {
+            const label = this.state.defconLabels[time_pair];
+            return type in label ? label[type] : default_val;
+        } else {
+            return default_val;
+        }
+    }
+
+    __update_defcon_labels(phase, power, other, type, val) {
+        const labels = Object.assign({}, this.state.defconLabels); 
+        const time_pair = this.__get_time_pair(phase, power, other);
+        if (!(time_pair in labels)) {
+            labels[time_pair] = {};
+        }
+        labels[time_pair][type] = val;
+        return this.setState({defconLabels: labels});
+    }
     
 
     renderCurrentMessages(engine, role) {
