@@ -143,9 +143,7 @@ export class ContentGame extends React.Component {
             orderBuildingPath: [],
             showAbbreviations: true,
 
-            //selectedDefconLevel: {}, // press, tactics, aggregate
-            //defconComment: null,
-            defconLabels: {}
+            defconLabels: {} // time_pair -> {press, tactics, aggregate, comment}
         };
 
         // Bind some class methods to this instance.
@@ -481,7 +479,6 @@ export class ContentGame extends React.Component {
     // ]
 
     onChangeCurrentPower(event) {
-        // this.__change_defcon_labels();
         return this.setState({power: event.target.value, tabPastMessages: null, tabCurrentMessages: null});
     }
 
@@ -494,7 +491,6 @@ export class ContentGame extends React.Component {
     }
 
     onChangeTabPastMessages(tab) {
-        // this.__change_defcon_labels();
         return this.setState({tabPastMessages: tab});
     }
 
@@ -801,17 +797,12 @@ export class ContentGame extends React.Component {
     }
 
     __change_past_phase(newPhaseIndex) {
-        // this.__change_defcon_labels();
         return this.setState({
             historyPhaseIndex: newPhaseIndex,
             historyCurrentLoc: null,
             historyCurrentOrders: null
         });
     }
-
-    // __change_defcon_labels() {
-    //     return this.setState({defconComment: "", selectedDefconLevel: {}});
-    // }
 
     onChangePastPhase(event) {
         this.__change_past_phase(event.target.value);
@@ -909,25 +900,10 @@ export class ContentGame extends React.Component {
         const defcon_levels = ["Not yet selected", "DEFCON 1", "DEFCON 2", "DEFCON 3", "DEFCON 4", "DEFCON 5"];
         const defcon_types = ["Press", "Tactics", "Aggregate"];
 
-        return (
-            <div className={'panel-messages'} key={'panel-messages'}>
-                {/* Messages. */}
-                <Tabs menu={tabNames} titles={titles} onChange={this.onChangeTabPastMessages} active={currentTabId}>
-                    {tabNames.map(protagonist => (
-                        <Tab key={protagonist} className={'game-messages'} display={currentTabId === protagonist}>
-                            {(!messageChannels.hasOwnProperty(protagonist) || !messageChannels[protagonist].length ?
-                                    (<div className={'no-game-message'}>No
-                                        messages{engine.isPlayerGame() ? ` with ${protagonist}` : ''}.</div>) :
-                                    messageChannels[protagonist].map((message, index) => (
-                                        <MessageView key={index} phase={engine.phase} owner={role} message={message}
-                                                    read={true}/>
-                                    ))
-                            )}
-                        </Tab>
-                        
-                    ))}
-                </Tabs>
-
+        let defcon_interface = ""
+        if (!(currentTabId === "GLOBAL")) {
+            defcon_interface = (
+            <div>
                 <p>Input DEFCON level for {currentTabId} from perspective of {role}, phase {phaseName}:</p>
                 {defcon_types.map((type, index) => (
                     <div style={{display: "flex", alignItems: "center"}} key={index}>
@@ -954,24 +930,29 @@ export class ContentGame extends React.Component {
                     onChange={event => {
                         this.__update_defcon_labels(phaseName, role, currentTabId, "comment", event.target.value);
                     }}/>
+            </div>);
+        }
 
-                {/* <button className="btn btn-secondary" 
-                        type="button" 
-                        id="defcon-submit-button"
-                        onClick={event => {
-                            // https://stackoverflow.com/questions/43638938/updating-an-object-with-setstate-in-react
-                            const labels = Object.assign({}, this.state.defconLabels); 
-                            const time_pair = phaseName + "-" + role + "-" + currentTabId;
-                            labels[time_pair] = {
-                                "defcon": this.state.selectedDefconLevel,
-                                "comment": this.state.defconComment
-                            };  
+        return (
+            <div className={'panel-messages'} key={'panel-messages'}>
+                {/* Messages. */}
+                <Tabs menu={tabNames} titles={titles} onChange={this.onChangeTabPastMessages} active={currentTabId}>
+                    {tabNames.map(protagonist => (
+                        <Tab key={protagonist} className={'game-messages'} display={currentTabId === protagonist}>
+                            {(!messageChannels.hasOwnProperty(protagonist) || !messageChannels[protagonist].length ?
+                                    (<div className={'no-game-message'}>No
+                                        messages{engine.isPlayerGame() ? ` with ${protagonist}` : ''}.</div>) :
+                                    messageChannels[protagonist].map((message, index) => (
+                                        <MessageView key={index} phase={engine.phase} owner={role} message={message}
+                                                    read={true}/>
+                                    ))
+                            )}
+                        </Tab>
+                        
+                    ))}
+                </Tabs>
 
-                            // return this.setState({defconComment: "", selectedDefconLevel: 0, defconLabels: labels});
-                            return this.setState({defconLabels: labels});
-                        }}>
-                    Submit
-                </button> */}
+                {defcon_interface}
             </div>
         );
     }
